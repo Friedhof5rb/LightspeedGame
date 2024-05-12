@@ -10,6 +10,10 @@ const io = new Server(httpServer);
 
 
 let Players = [];
+let Bullets = [];
+
+let nextBulletId = 0;
+
 
 //pixels per 10th second, playerSpeed/10 = vergelichbar mit lightspeed
 let playerSpeed = 10;
@@ -72,6 +76,13 @@ io.on("connect",(socket) => {
         socket.emit("synchronizeEveryObject",objectDataBinary);
     });
 
+    socket.on("bullet",(bulletdata)=>{
+            let player = Players.find(obj => obj.id ===bulletdata.id)
+            SpawnBullet(player,bulletdata.angle);
+    })
+
+
+
     socket.on("ping",()=>{
         socket.emit("pong");
     })
@@ -127,6 +138,63 @@ setInterval(()=>{
 
 },10);
 
+
+setInterval(()=>{
+
+   Bullets.forEach((bullet)=>{
+
+        bullet.x += bullet.vx;
+        bullet.y += bullet.vy;
+        bullet.duration -= 1;
+
+   });
+   for (let i = Bullets.length - 1; i >= 0; i--) {
+        if(Bullets[i].duration <= 0){
+                Bullets.splice(i,1);
+        }
+    }
+
+
+
+
+   Bullets.forEach(bullet => {
+
+        let positionST = {x:bullet.x,y:bullet.y,time:time}
+
+        bullet.past.push(positionST);
+
+        if(  bullet.past.length > 500){
+            bullet.past.splice(0,1);
+        }
+
+      });
+    
+      let data = convertDataToBinary(Bullets);
+
+      io.emit("syncbullets",data);
+
+      Bullets.forEach(bullet => {
+        bullet.past = [];
+      });
+
+},20);
+
+
+
+
+
+
+function SpawnBullet(player,angle){
+    let magnitude = 3;
+    const vx = magnitude * Math.cos(angle);
+    const vy = magnitude * Math.sin(angle);
+
+
+    let bullet = {id:nextBulletId,x:player.x,y:player.y,playerid:player.id,vx:vx,vy:vy,duration:1000,past:[]};
+    Bullets.push(bullet);
+    nextBulletId++;
+    //console.log(nextBulletId);
+}
 
 
 

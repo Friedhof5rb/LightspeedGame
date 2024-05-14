@@ -231,7 +231,7 @@ function sendBufferedData() {
   
 
 //Host Server
-app.use(express.static("../public"));
+app.use(express.static("public"));
 httpServer.listen(25565, () => {
   console.log("Server is running.");
 });

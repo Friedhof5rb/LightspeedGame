@@ -1,8 +1,17 @@
-#canvas-container {
-    width: 100%;
-    text-align: center;
-  }
-  
-  canvas {
-    display: inline-block;
-  }
+#customCursor {
+  position: absolute;
+  width: 20px; /* Adjust size as needed */
+  height: 20px;
+  background-image: url('aim.png'); /* Replace with your image path */
+  background-size: cover;
+  pointer-events: none; /* Allow clicking through the cursor */
+  z-index: 9999; /* Ensure cursor is on top */
+}
+#myCanvas {
+  position: absolute;
+  z-index: 1;
+}
+
+
+
+
